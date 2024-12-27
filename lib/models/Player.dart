@@ -1,18 +1,18 @@
 class Player {
   final String name;
   final String id;
-  final int lives;
+  int? lives;
   double? x;
   double? y;
   bool isReady;
-  bool get isAlive => lives > 0;
+  bool get isAlive => lives! > 0;
 
 
 
   Player ({
     required this.name,
     required this.id,
-    required this.lives,
+    this.lives,
     this.x,
     this.y,
     this.isReady = false,

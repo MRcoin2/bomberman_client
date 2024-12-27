@@ -26,7 +26,7 @@ class _PlayerListState extends State<PlayerList> {
           itemCount: widget.players.length,
           itemBuilder: (context, index) {
             return ListTile(
-              leading: Text('Player $index'),
+              leading: Text(widget.players[index].name),
               trailing: Text(widget.players[index].isReady ? 'Ready' : 'Not Ready',
                   style: TextStyle(
                       color: widget.players[index].isReady ? Colors.green : Colors

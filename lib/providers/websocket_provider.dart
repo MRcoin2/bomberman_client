@@ -22,6 +22,7 @@ class WebSocketProvider with ChangeNotifier {
     } catch (e) {
       print(e);
     }
+    _streamController.stream.listen((data) {print(data);});
     print("Connected to $url");
   }
 
@@ -35,7 +36,13 @@ class WebSocketProvider with ChangeNotifier {
     _streamController.stream.listen(callback);
   }
 
+  //clear a specific listener
+  void removeOnMessage(Function(dynamic) callback) {
+    _streamController.stream.listen(callback).cancel();
+  }
+
   void sendMessage(String message) {
+    print("sending message: $message");
     _channel?.sink.add(message);
   }
 

@@ -9,7 +9,9 @@ import '../providers/game_data_provider.dart';
 import '../widgets/player_list.dart';
 
 class LobbyScreen extends StatefulWidget {
-  const LobbyScreen({super.key});
+  final String nameText;
+
+  const LobbyScreen(String this.nameText, {super.key});
 
   @override
   State<LobbyScreen> createState() => _LobbyScreenState();
@@ -27,6 +29,7 @@ class _LobbyScreenState extends State<LobbyScreen> {
 
   @override
   void initState() {
+    _nameController.text = widget.nameText;
     super.initState();
   }
 
@@ -41,7 +44,11 @@ class _LobbyScreenState extends State<LobbyScreen> {
         child: Column(
           children: [
             Expanded(
-              child: PlayerList(players: context.watch<GameDataProvider>().players),
+              child: Consumer<GameDataProvider>(
+                builder: (context, gameData, child) {
+                  return PlayerList(players: gameData.players);
+                },
+              ),
             ),
             const SizedBox(height: 20),
             Row(
@@ -51,6 +58,8 @@ class _LobbyScreenState extends State<LobbyScreen> {
                     controller: _nameController,
                     onEditingComplete: () {
                       //TODO send name to server
+                      context.read<WebSocketProvider>().sendMessage(
+                          '{"Type":"CLIENT_LOBBY_CHANGE_NAME","Payload":"${_nameController.text}"}');
                     },
                     decoration: const InputDecoration(
                       hintText: 'Name',
