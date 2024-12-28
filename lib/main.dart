@@ -1,5 +1,4 @@
 import 'package:bomberman_client/providers/game_data_provider.dart';
-import 'package:bomberman_client/providers/websocket_provider.dart';
 import 'package:bomberman_client/screens/main_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -8,8 +7,7 @@ void main() {
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => WebSocketProvider()),
-        ChangeNotifierProvider(create: (_)=> GameDataProvider()),
+        ChangeNotifierProvider(create: (_) => GameDataProvider())
       ],
       child: const MyApp(),
     ),

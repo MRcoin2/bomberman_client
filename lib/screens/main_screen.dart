@@ -4,7 +4,6 @@ import 'package:bomberman_client/providers/game_data_provider.dart';
 import 'package:bomberman_client/screens/lobby_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:bomberman_client/providers/websocket_provider.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -51,18 +50,15 @@ class _MainScreenState extends State<MainScreen> {
           ElevatedButton(
             onPressed: () async {
               final url = 'ws://${_ipController.text}/ws';
-              await context.read<WebSocketProvider>().connect(url);
-              // Register a callback to listen for messages and update game state
-              context.read<WebSocketProvider>().onMessage((message) {
-                context.read<GameDataProvider>().updateData(message);
-              });
+              await context.read<GameDataProvider>().connect(url);
               //send join message
-              context.read<WebSocketProvider>().sendMessage('{"Type":"CLIENT_LOBBY_JOIN","Payload":"${_nameController.text}"}');
-              context.read<WebSocketProvider>().onMessage((message) {
+              context.read<GameDataProvider>().sendMessage('{"Type":"CLIENT_LOBBY_JOIN","Payload":"${_nameController.text}"}');
+              context.read<GameDataProvider>().onMessage((message) {
                 var data = jsonDecode(message);
                 if (data['Type'] == 'SERVER_LOBBY_JOIN') {
                   if(data['Payload']['Response'] == 'OK') {
                     context.read<GameDataProvider>().id = data['Payload']['PlayerId'];
+                    context.read<GameDataProvider>().clearListeners();
                     Navigator.pushReplacement(context, MaterialPageRoute(
                         builder: (context) => LobbyScreen(_nameController.text)));
                   }else{

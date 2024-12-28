@@ -1,6 +1,7 @@
+import 'dart:convert';
 import 'dart:io';
 
-import 'package:bomberman_client/providers/websocket_provider.dart';
+import 'package:bomberman_client/screens/game_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -56,10 +57,10 @@ class _LobbyScreenState extends State<LobbyScreen> {
                 Expanded(
                   child: TextField(
                     controller: _nameController,
-                    onEditingComplete: () {
+                    onChanged: (text) {
                       //TODO send name to server
-                      context.read<WebSocketProvider>().sendMessage(
-                          '{"Type":"CLIENT_LOBBY_CHANGE_NAME","Payload":"${_nameController.text}"}');
+                      context.read<GameDataProvider>().sendMessage(
+                          '{"Type":"CLIENT_LOBBY_CHANGE_NAME","Payload":"${text}"}');
                     },
                     decoration: const InputDecoration(
                       hintText: 'Name',
@@ -69,7 +70,21 @@ class _LobbyScreenState extends State<LobbyScreen> {
                 const SizedBox(width: 20),
                 ElevatedButton(
                   onPressed: () {
-                    //TODO send ready to server
+                    context.read<GameDataProvider>().sendMessage(
+                        '{"Type":"CLIENT_LOBBY_READY","Payload":""}');
+                    context.read<GameDataProvider>().onMessage(
+                      (message) {
+                        var data = jsonDecode(message);
+                        if (data['Type'] == 'SERVER_GAME_START') {
+                          context.read<GameDataProvider>().clearListeners();
+                          Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      const GameScreen()));
+                        }
+                      },
+                    );
                   },
                   child: const Padding(
                     padding: EdgeInsets.all(10.0),

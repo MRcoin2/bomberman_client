@@ -4,5 +4,5 @@ class Explosion {
   int time;
   String playerId;
 
-  Explosion(this.x, this.y, this.playerId, {int tickRate = 1}) : time = 3 * tickRate;
+  Explosion(this.playerId,this.x, this.y, this.time);
 }
