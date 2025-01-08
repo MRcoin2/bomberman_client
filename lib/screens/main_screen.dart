@@ -23,6 +23,22 @@ class _MainScreenState extends State<MainScreen> {
     _ipController.text = 'localhost:5038';
     super.initState();
   }
+
+  void _handlePolicyViolation(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            Icon(Icons.error, color: Colors.red),
+            const SizedBox(width: 8),
+            Expanded(child: Text(message)),
+          ],
+        ),
+        duration: Duration(seconds: 5)
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -50,15 +66,18 @@ class _MainScreenState extends State<MainScreen> {
           ElevatedButton(
             onPressed: () async {
               final url = 'ws://${_ipController.text}/ws';
-              await context.read<GameDataProvider>().connect(url);
+              final gameDataProvider = context.read<GameDataProvider>();
+              gameDataProvider.onPolicyViolation = _handlePolicyViolation;
+              await gameDataProvider.connect(url);
+
               //send join message
-              context.read<GameDataProvider>().sendMessage('{"Type":"CLIENT_LOBBY_JOIN","Payload":"${_nameController.text}"}');
-              context.read<GameDataProvider>().onMessage((message) {
+              gameDataProvider.sendMessage('{"Type":"CLIENT_LOBBY_JOIN","Payload":"${_nameController.text}"}');
+              gameDataProvider.onMessage((message) {
                 var data = jsonDecode(message);
                 if (data['Type'] == 'SERVER_LOBBY_JOIN') {
                   if(data['Payload']['Response'] == 'OK') {
-                    context.read<GameDataProvider>().id = data['Payload']['PlayerId'];
-                    context.read<GameDataProvider>().clearListeners();
+                    gameDataProvider.id = data['Payload']['PlayerId'];
+                    gameDataProvider.clearListeners();
                     Navigator.pushReplacement(context, MaterialPageRoute(
                         builder: (context) => LobbyScreen(_nameController.text)));
                   }else{

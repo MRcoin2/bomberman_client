@@ -47,9 +47,17 @@ class GameDataProvider with ChangeNotifier {
         // print("received message: $event");
         _streamController.add(event);
         _UpdateData(event);
+      }, onDone: () {
+        if (_channel?.closeCode == status.policyViolation) {
+          // Handle policy violation (e.g., lobby is full)
+          onPolicyViolation?.call("Cannot connect to server: ${_channel?.closeReason ?? "Policy violation occurred."}");        
+        }
       });
-      print("Connected to $url");
     } catch (e) {
+      if (e is WebSocketChannelException) {
+        onPolicyViolation?.call("Cannot connect to server: ${e.message}");
+      }
+
       print("Error connecting to WebSocket: $e");
     }
   }
@@ -60,6 +68,8 @@ class GameDataProvider with ChangeNotifier {
     _channel = null;
     notifyListeners();
   }
+
+  void Function(String message)? onPolicyViolation;
 
   /// Listen for incoming messages
   void onMessage(Function(dynamic) callback) {
@@ -103,77 +113,82 @@ class GameDataProvider with ChangeNotifier {
       );
     }).toList();
   }
-void _updateGameState(Map<String, dynamic> playfield) {
-  playfield = playfield["Playfield"];
 
-  // Clear existing lists
-  _blocks.clear();
-  _walls.clear();
-  _players.clear();
-  _bombs.clear();
-  _explosions.clear();
-  _items.clear();
-
-  // Update blocks
-  for (var block in playfield["Blocks"]) {
-    _blocks.add(Block(
-      x: block["X"].toDouble(),
-      y: block["Y"].toDouble(),
-    ));
+  bool isConnected() {
+    return _channel != null;
   }
 
-  // Update walls
-  for (var wall in playfield["Walls"]) {
-    _walls.add(Wall(
-      x: wall["X"],
-      y: wall["Y"],
-    ));
+  void _updateGameState(Map<String, dynamic> playfield) {
+    playfield = playfield["Playfield"];
+
+    // Clear existing lists
+    _blocks.clear();
+    _walls.clear();
+    _players.clear();
+    _bombs.clear();
+    _explosions.clear();
+    _items.clear();
+
+    // Update blocks
+    for (var block in playfield["Blocks"]) {
+      _blocks.add(Block(
+        x: block["X"].toDouble(),
+        y: block["Y"].toDouble(),
+      ));
+    }
+
+    // Update walls
+    for (var wall in playfield["Walls"]) {
+      _walls.add(Wall(
+        x: wall["X"],
+        y: wall["Y"],
+      ));
+    }
+
+    // Update players
+    for (var player in playfield["Players"]) {
+      var p = Player(
+        name: player["Name"],
+        isReady: player["IsReady"],
+        id: player["Id"],
+        x: player["X"].toDouble(),
+        y: player["Y"].toDouble(),
+        lives: player["Lives"],
+      );
+      _players.add(p);
+    }
+
+    // Update bombs
+    for (var bomb in playfield["Bombs"]) {
+      _bombs.add(Bomb(
+        bomb["PlayerId"], bomb["X"], bomb["Y"], bomb["Timer"],
+      ));
+    }
+
+    // Update explosions
+    for (var explosion in playfield["Explosions"]) {
+      _explosions.add(Explosion(
+        explosion["PlayerId"], explosion["X"], explosion["Y"], explosion["Timer"],
+      ));
+    }
+
+    // Update items
+    for (var item in playfield["Items"]) {
+      _items.add(Item(
+        item["X"], item["Y"], item["Type"],
+      ));
+    }
+
+    // Update timer
+    _timer = playfield["Timer"]["Timer"];
+
+    notifyListeners();
   }
 
-  // Update players
-  for (var player in playfield["Players"]) {
-    var p = Player(
-      name: player["Name"],
-      isReady: player["IsReady"],
-      id: player["Id"],
-      x: player["X"].toDouble(),
-      y: player["Y"].toDouble(),
-      lives: player["Lives"],
-    );
-    _players.add(p);
+    @override
+    void dispose() {
+      _channel?.sink.close(status.goingAway);
+      _streamController.close();
+      super.dispose();
+    }
   }
-
-  // Update bombs
-  for (var bomb in playfield["Bombs"]) {
-    _bombs.add(Bomb(
-      bomb["PlayerId"], bomb["X"], bomb["Y"], bomb["Timer"],
-    ));
-  }
-
-  // Update explosions
-  for (var explosion in playfield["Explosions"]) {
-    _explosions.add(Explosion(
-      explosion["PlayerId"], explosion["X"], explosion["Y"], explosion["Timer"],
-    ));
-  }
-
-  // Update items
-  for (var item in playfield["Items"]) {
-    _items.add(Item(
-      item["X"], item["Y"], item["Type"],
-    ));
-  }
-
-  // Update timer
-  _timer = playfield["Timer"]["Timer"];
-
-  notifyListeners();
-}
-
-  @override
-  void dispose() {
-    _channel?.sink.close(status.goingAway);
-    _streamController.close();
-    super.dispose();
-  }
-}
