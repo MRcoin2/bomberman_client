@@ -1,6 +1,6 @@
 class Block {
-  int x;
-  int y;
+  double x;
+  double y;
 
   Block({
     required this.x,

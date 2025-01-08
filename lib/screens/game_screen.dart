@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../providers/game_data_provider.dart';
 import '../models/Player.dart';
@@ -11,20 +12,65 @@ class GameScreen extends StatefulWidget {
 }
 
 class _GameScreenState extends State<GameScreen> {
+  final FocusNode _focusNode = FocusNode();
+
+  void _handleKeyEvent(BuildContext context, KeyEvent event) {
+    final gameData = Provider.of<GameDataProvider>(context, listen: false);
+      print(event.logicalKey.keyLabel);
+      switch (event.logicalKey.keyLabel) {
+        case "Arrow Up": // Arrow up
+          print('Arrow up');
+          //send to server
+          gameData.sendMessage('{"Type":"CLIENT_GAME_MOVE","Payload":{"Direction":"up", "KeyDown":${event is KeyDownEvent || event is KeyRepeatEvent}}}');
+          break;
+        case "Arrow Down": // Arrow down
+          print('Arrow down');
+          gameData.sendMessage('{"Type":"CLIENT_GAME_MOVE","Payload":{"Direction":"down", "KeyDown":${event is KeyDownEvent || event is KeyRepeatEvent}}}');
+          break;
+        case "Arrow Left": // Arrow left
+          print('Arrow left');
+          gameData.sendMessage('{"Type":"CLIENT_GAME_MOVE","Payload":{"Direction":"left", "KeyDown":${event is KeyDownEvent || event is KeyRepeatEvent}}}');
+          break;
+        case "Arrow Right": // Arrow right
+          print('Arrow right');
+          gameData.sendMessage('{"Type":"CLIENT_GAME_MOVE","Payload":{"Direction":"right", "KeyDown":${event is KeyDownEvent || event is KeyRepeatEvent}}}');
+          break;
+        case " ": // Space
+          print('Space');
+          gameData.sendMessage('{"Type":"CLIENT_GAME_BOMB","Payload":""}');
+          break;
+      }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      //go to main screen
+      floatingActionButton: FloatingActionButton(
+        focusNode: FocusNode(skipTraversal: true),
+        onPressed: () {
+          Navigator.of(context).popAndPushNamed('/');
+        },
+        child: const Icon(Icons.exit_to_app),
+      ),
       body: Column(
         children: [
           Expanded(
-            child: Center(
-              child: Consumer<GameDataProvider>(
-                builder: (context, gameData, child) {
-                  return CustomPaint(
-                    size: Size(300, 300),
-                    painter: GameCanvasPainter(gameData),
-                  );
-                },
+            child: DefaultTextEditingShortcuts(
+              child: KeyboardListener(
+                autofocus: true,
+                onKeyEvent: (event) => _handleKeyEvent(context, event),
+                focusNode: _focusNode,
+                child: Center(
+                  child: Consumer<GameDataProvider>(
+                    builder: (context, gameData, child) {
+                      return CustomPaint(
+                        size: Size(300, 300),
+                        painter: GameCanvasPainter(gameData),
+                      );
+                    },
+                  ),
+                ),
               ),
             ),
           ),
@@ -44,7 +90,9 @@ class _GameScreenState extends State<GameScreen> {
       ),
     );
   }
-}const double tileWidth = 20.0;
+}
+
+const double tileWidth = 20.0;
 
 class GameCanvasPainter extends CustomPainter {
   final GameDataProvider gameData;
