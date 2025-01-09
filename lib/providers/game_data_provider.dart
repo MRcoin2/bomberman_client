@@ -67,7 +67,7 @@ class GameDataProvider with ChangeNotifier {
 
   /// Disconnect WebSocket
   void disconnect() {
-    _channel?.sink.close(status.goingAway);
+    _channel?.sink.close(status.normalClosure);
     _channel = null;
     notifyListeners();
   }
