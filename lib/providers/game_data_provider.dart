@@ -26,6 +26,9 @@ class GameDataProvider with ChangeNotifier {
   int? _timer = 0;
   late String id;
 
+  int mapWidth=1;
+  int mapHeight=1;
+
   GameDataProvider() {
     _streamController = StreamController.broadcast();
   }
@@ -44,7 +47,7 @@ class GameDataProvider with ChangeNotifier {
     try {
       _channel = WebSocketChannel.connect(Uri.parse(url));
       _channel?.stream.listen((event) {
-        // print("received message: $event");
+        //print("received message: $event");
         _streamController.add(event);
         _UpdateData(event);
       }, onDone: () {
@@ -121,74 +124,79 @@ class GameDataProvider with ChangeNotifier {
   void _updateGameState(Map<String, dynamic> playfield) {
     playfield = playfield["Playfield"];
 
-    // Clear existing lists
-    _blocks.clear();
-    _walls.clear();
-    _players.clear();
-    _bombs.clear();
-    _explosions.clear();
-    _items.clear();
+  // Clear existing lists
+  _blocks.clear();
+  _walls.clear();
+  _players.clear();
+  _bombs.clear();
+  _explosions.clear();
+  _items.clear();
 
-    // Update blocks
-    for (var block in playfield["Blocks"]) {
-      _blocks.add(Block(
-        x: block["X"].toDouble(),
-        y: block["Y"].toDouble(),
-      ));
-    }
+  // Update map dimensions
+  mapWidth = playfield["Width"];
+  mapHeight = playfield["Height"];
 
-    // Update walls
-    for (var wall in playfield["Walls"]) {
-      _walls.add(Wall(
-        x: wall["X"],
-        y: wall["Y"],
-      ));
-    }
 
-    // Update players
-    for (var player in playfield["Players"]) {
-      var p = Player(
-        name: player["Name"],
-        isReady: player["IsReady"],
-        id: player["Id"],
-        x: player["X"].toDouble(),
-        y: player["Y"].toDouble(),
-        lives: player["Lives"],
-      );
-      _players.add(p);
-    }
-
-    // Update bombs
-    for (var bomb in playfield["Bombs"]) {
-      _bombs.add(Bomb(
-        bomb["PlayerId"], bomb["X"], bomb["Y"], bomb["Timer"],
-      ));
-    }
-
-    // Update explosions
-    for (var explosion in playfield["Explosions"]) {
-      _explosions.add(Explosion(
-        explosion["PlayerId"], explosion["X"], explosion["Y"], explosion["Timer"],
-      ));
-    }
-
-    // Update items
-    for (var item in playfield["Items"]) {
-      _items.add(Item(
-        item["X"], item["Y"], item["Type"],
-      ));
-    }
-
-    // Update timer
-    _timer = playfield["Timer"]["Timer"];
-
-    notifyListeners();
+  // Update blocks
+  for (var block in playfield["Blocks"]) {
+    _blocks.add(Block(
+      x: block["X"].toDouble(),
+      y: block["Y"].toDouble(),
+    ));
   }
 
-    @override
-    void dispose() {
-      _channel?.sink.close(status.goingAway);
-      _streamController.close();
-      super.dispose();
-    }
+  // Update walls
+  for (var wall in playfield["Walls"]) {
+    _walls.add(Wall(
+      x: wall["X"],
+      y: wall["Y"],
+    ));
   }
+
+  // Update players
+  for (var player in playfield["Players"]) {
+    var p = Player(
+      name: player["Name"],
+      isReady: player["IsReady"],
+      id: player["Id"],
+      x: player["X"].toDouble(),
+      y: player["Y"].toDouble(),
+      lives: player["Lives"],
+    );
+    _players.add(p);
+  }
+
+  // Update bombs
+  for (var bomb in playfield["Bombs"]) {
+    _bombs.add(Bomb(
+      bomb["OwnerId"], bomb["X"], bomb["Y"], bomb["Fuse"],
+    ));
+  }
+
+  // Update explosions
+  for (var explosion in playfield["Explosions"]) {
+    _explosions.add(Explosion(
+      explosion["OwnerId"], explosion["X"], explosion["Y"], explosion["Time"],
+    ));
+  }
+
+  // Update items
+  for (var item in playfield["Items"]) {
+    _items.add(Item(
+      item["X"], item["Y"], item["Type"],
+    ));
+  }
+
+  // Update timer
+  _timer = playfield["Timer"]["SecondsLeft"];
+
+  notifyListeners();
+}
+
+  @override
+  void dispose() {
+    _channel?.sink.close(status.goingAway);
+    _streamController.close();
+    super.dispose();
+  }
+}
