@@ -71,7 +71,7 @@ class _MainScreenState extends State<MainScreen> {
               await gameDataProvider.connect(url);
 
               //send join message
-              gameDataProvider.sendMessage('{"Type":"CLIENT_LOBBY_JOIN","Payload":"${_nameController.text}"}');
+              gameDataProvider.sendMessage('{"Type":"CLIENT_LOBBY_JOIN","Payload":{"Name":"${_nameController.text}"}}');
               gameDataProvider.onMessage((message) {
                 var data = jsonDecode(message);
                 if (data['Type'] == 'SERVER_LOBBY_JOIN') {

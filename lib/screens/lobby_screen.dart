@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:bomberman_client/screens/game_screen.dart';
+import 'package:bomberman_client/widgets/settings_panel.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -34,6 +35,8 @@ class _LobbyScreenState extends State<LobbyScreen> {
     super.initState();
   }
 
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -43,8 +46,10 @@ class _LobbyScreenState extends State<LobbyScreen> {
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.end,
           children: [
             Expanded(
+              flex: 2,
               child: Consumer<GameDataProvider>(
                 builder: (context, gameData, child) {
                   return PlayerList(players: gameData.players);
@@ -52,46 +57,59 @@ class _LobbyScreenState extends State<LobbyScreen> {
               ),
             ),
             const SizedBox(height: 20),
-            Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _nameController,
-                    onChanged: (text) {
-                      //TODO send name to server
-                      context.read<GameDataProvider>().sendMessage(
-                          '{"Type":"CLIENT_LOBBY_CHANGE_NAME","Payload":"${text}"}');
-                    },
-                    decoration: const InputDecoration(
-                      hintText: 'Name',
+            SettingsPanel(),
+            const SizedBox(width: 20),
+            Expanded(
+              flex: 1,
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Card(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: TextField(
+                          controller: _nameController,
+                          onChanged: (text) {
+                            context.read<GameDataProvider>().sendMessage(
+                                '{"Type":"CLIENT_LOBBY_CHANGE_NAME","Payload":{"Name":"${text}"}}');
+                          },
+                          decoration: const InputDecoration(
+                            hintText: 'Name',
+                            labelText: 'Name',
+                          ),
+                        ),
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(width: 20),
-                ElevatedButton(
-                  onPressed: () {
-                    context.read<GameDataProvider>().sendMessage(
-                        '{"Type":"CLIENT_LOBBY_READY","Payload":""}');
-                    context.read<GameDataProvider>().onMessage(
-                      (message) {
-                        var data = jsonDecode(message);
-                        if (data['Type'] == 'SERVER_GAME_START') {
-                          context.read<GameDataProvider>().clearListeners();
-                          Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) =>
-                                      const GameScreen()));
-                        }
+                  const SizedBox(width: 20),
+                  Expanded(
+                    child: ElevatedButton(
+
+                      onPressed: () {
+                        context.read<GameDataProvider>().sendMessage(
+                            '{"Type":"CLIENT_LOBBY_READY","Payload":{"_":"_"}}');
+                        context.read<GameDataProvider>().onMessage(
+                          (message) {
+                            var data = jsonDecode(message);
+                            if (data['Type'] == 'SERVER_GAME_START') {
+                              context.read<GameDataProvider>().clearListeners();
+                              Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          const GameScreen()));
+                            }
+                          },
+                        );
                       },
-                    );
-                  },
-                  child: const Padding(
-                    padding: EdgeInsets.all(10.0),
-                    child: Text('Ready'),
+                      child: const Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 30),
+                        child: Text('Ready', style: TextStyle(fontSize: 24)),
+                      ),
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ],
         ),

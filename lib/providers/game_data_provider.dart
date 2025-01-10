@@ -94,7 +94,9 @@ class GameDataProvider with ChangeNotifier {
     try {
       var data = jsonDecode(message);
       if (data["Type"] == "SERVER_LOBBY_UPDATE") {
+        print("Updating players in lobby (${data["Type"]})");
         _updatePlayers(data["Payload"]);
+        print(_players);
       }
       else if (data["Type"] == "SERVER_GAME_UPDATE") {
         _updateGameState(data["Payload"]);
