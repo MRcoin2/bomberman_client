@@ -42,17 +42,25 @@ class _SettingsPanelState extends State<SettingsPanel> {
             '"StartSpeed":${int.parse(_startSpeedController.text).round()}}}');
   }
 
-  void _updateSettings(settings) {
-    _widthController.text = (settings['Width']??0).toString();
-    _heightController.text = (settings['Height']??0).toString();
-    _blockDensityController.text = (settings['BlockDensity']??0).toString();
-    _gameTimeController.text = (settings['GameTime']??0).toString();
-    _livesController.text = (settings['Lives']??0).toString();
-    _startPowerController.text = (settings['StartPower']??0).toString();
-    _startBombsController.text = (settings['StartBombs']??0).toString();
-    _startSpeedController.text = (settings['StartSpeed']??0).toString();
+  void _updateSettings(Map<String, dynamic> settings) {
+    void updateController(TextEditingController controller, dynamic value) {
+      final cursorPos = controller.selection;
+      controller.text = (value ?? 0).toString();
+      controller.selection = TextSelection.collapsed(
+        offset: cursorPos.start.clamp(0, controller.text.length),
+      );
+    }
 
+    updateController(_widthController, settings['Width']);
+    updateController(_heightController, settings['Height']);
+    updateController(_blockDensityController, settings['BlockDensity']);
+    updateController(_gameTimeController, settings['GameTime']);
+    updateController(_livesController, settings['Lives']);
+    updateController(_startPowerController, settings['StartPower']);
+    updateController(_startBombsController, settings['StartBombs']);
+    updateController(_startSpeedController, settings['StartSpeed']);
   }
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
