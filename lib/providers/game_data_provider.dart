@@ -164,6 +164,10 @@ class GameDataProvider with ChangeNotifier {
       x: player["X"].toDouble(),
       y: player["Y"].toDouble(),
       lives: player["Lives"],
+      score: player["Score"],
+      bombLimit: player["BombLimit"],
+      bombPower: player["BombPower"],
+      speed: player["Speed"]
     );
     _players.add(p);
   }
@@ -197,7 +201,7 @@ class GameDataProvider with ChangeNotifier {
 
   @override
   void dispose() {
-    _channel?.sink.close(status.goingAway);
+    _channel?.sink.close(status.normalClosure);
     _streamController.close();
     super.dispose();
   }

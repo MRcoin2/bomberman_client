@@ -69,12 +69,14 @@ class _SettingsPanelState extends State<SettingsPanel> {
       Provider.of<GameDataProvider>(context).onMessage((message) {
         //decode the json message
         var data = jsonDecode(message);
+        //print(data);
         if (data['Type'] == 'SERVER_LOBBY_UPDATE_SETTINGS') {
           _updateSettings(data['Payload']);
         }
       });
     }
   }
+
   @override
   Widget build(BuildContext context) {
     return Expanded(

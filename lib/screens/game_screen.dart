@@ -188,7 +188,7 @@ class _GameScreenState extends State<GameScreen> {
                                   ),
                               ],
                             ),
-                            trailing: Text("${2137}",
+                            trailing: Text(player.score.toString(),
                                 style: TextStyle(
                                     color: Colors.green,
                                     fontWeight: FontWeight.bold,
