@@ -39,7 +39,7 @@ class _SettingsPanelState extends State<SettingsPanel> {
             '"Lives":${int.parse(_livesController.text).round()},'
             '"StartPower":${int.parse(_startPowerController.text).round()},'
             '"StartBombs":${int.parse(_startBombsController.text).round()},'
-            '"StartSpeed":${int.parse(_startSpeedController.text).round()}}}');
+            '"StartSpeed":${double.parse(_startSpeedController.text)}}}');
   }
 
   void _updateSettings(Map<String, dynamic> settings) {
