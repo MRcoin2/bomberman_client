@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Generator: Adobe Illustrator 24.1.2, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+
+<svg
+   version="1.1"
+   id="Layer_3"
+   x="0px"
+   y="0px"
+   viewBox="0 0 128 128"
+   style="enable-background:new 0 0 128 128;"
+   xml:space="preserve"
+   sodipodi:docname="emoji_u1f4a5_green.svg"
+   inkscape:version="1.4 (e7c3feb100, 2024-10-09)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"><defs
+   id="defs2"><filter
+     style="color-interpolation-filters:sRGB;"
+     inkscape:label="Color Shift"
+     id="filter414"
+     x="-0.079916442"
+     y="-0.070102473"
+     width="1.1317907"
+     height="1.1143767"><feColorMatrix
+       type="hueRotate"
+       values="84"
+       result="color1"
+       id="feColorMatrix413" /><feColorMatrix
+       type="saturate"
+       values="1"
+       result="color2"
+       id="feColorMatrix414" /></filter><filter
+     style="color-interpolation-filters:sRGB;"
+     inkscape:label="Color Shift"
+     id="filter416"
+     x="-0.046788137"
+     y="-0.047367898"
+     width="1.0787186"
+     height="1.0846425"><feColorMatrix
+       type="hueRotate"
+       values="84"
+       result="color1"
+       id="feColorMatrix415" /><feColorMatrix
+       type="saturate"
+       values="1"
+       result="color2"
+       id="feColorMatrix416" /></filter></defs><sodipodi:namedview
+   id="namedview2"
+   pagecolor="#ffffff"
+   bordercolor="#000000"
+   borderopacity="0.25"
+   inkscape:showpageshadow="2"
+   inkscape:pageopacity="0.0"
+   inkscape:pagecheckerboard="0"
+   inkscape:deskcolor="#d1d1d1"
+   inkscape:zoom="8.8388348"
+   inkscape:cx="66.072058"
+   inkscape:cy="50.798551"
+   inkscape:window-width="1920"
+   inkscape:window-height="1011"
+   inkscape:window-x="0"
+   inkscape:window-y="0"
+   inkscape:window-maximized="1"
+   inkscape:current-layer="g2" />
+<g
+   id="g2">
+	<polygon
+   style="fill:#FFA000;stroke:#F44336;stroke-width:3;stroke-miterlimit:10;filter:url(#filter416)"
+   points="68.27,8.51 84.11,41.67 119.44,9.79    101.38,55.43 121.05,50.12 102.4,76.63 119.43,82.5 102.03,90.77 118.96,119.8 86.77,99.89 79.87,121.43 69.65,98.4 40.65,120.18    49.47,95.33 9.5,103.37 39.42,81.1 7.89,58.4 43.85,61.51 10.6,10.52 64,45.51  "
+   id="polygon1" />
+	<radialGradient
+   id="SVGID_1_"
+   cx="77.5873"
+   cy="75.7353"
+   r="26.3653"
+   gradientUnits="userSpaceOnUse">
+		<stop
+   offset="0"
+   style="stop-color:#FFFDE7"
+   id="stop1" />
+		<stop
+   offset="1"
+   style="stop-color:#FFF176"
+   id="stop2" />
+	</radialGradient>
+	<polygon
+   style="fill:url(#SVGID_1_);stroke:#FFEB3B;stroke-width:2;stroke-miterlimit:10;filter:url(#filter414)"
+   points="72.63,34.77 82.17,59.48    101.05,38.17 86.86,67.91 104.07,62.74 88.12,78.59 101.48,82.98 88.68,84.87 98.87,99.31 82.31,88.73 78.5,101.05 72.63,86.96    57.98,98.12 64,84.45 41,89.47 57.95,79.19 35.84,68.56 60.33,70.84 40.22,39.29 71.1,60.17  "
+   id="polygon2" />
+</g>
+</svg>
