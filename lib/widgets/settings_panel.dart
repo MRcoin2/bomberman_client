@@ -27,7 +27,8 @@ class _SettingsPanelState extends State<SettingsPanel> {
   TextEditingController _startSpeedController = TextEditingController();
 
   void _sendSettings(BuildContext context) {
-    if (!_formKey.currentState!.validate()) {
+    if (!_formKey.currentState!.validate() || _didChange) {
+      _didChange = false;
       return;
     }
     Provider.of<GameDataProvider>(context, listen: false).sendMessage(
