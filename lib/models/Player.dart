@@ -5,7 +5,7 @@ class Player {
   int? score;
   int? bombPower;
   int? bombLimit;
-  double? speed;
+  int? speed;
   double? x;
   double? y;
   bool isReady;
