@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import '../models/ItemType.dart';
 import '../providers/game_data_provider.dart';
 import '../models/Player.dart';
 import 'dart:math' as math;
@@ -25,10 +26,10 @@ class _GameScreenState extends State<GameScreen> {
 
   late UI.Image wallImage;
   late UI.Image blockImage;
-  late UI.Image bombImage;
-  late UI.Image explosionImage;
-  late UI.Image itemImage;
-  late UI.Image playerImage;
+  late List<UI.Image> bombImages;
+  late List<UI.Image> explosionImages;
+  late Map<String, UI.Image> itemImages;
+  late List<UI.Image> playerImages;
 
   void _handleKeyEvent(BuildContext context, KeyEvent event) {
     final gameData = Provider.of<GameDataProvider>(context, listen: false);
@@ -62,13 +63,33 @@ class _GameScreenState extends State<GameScreen> {
     }
   }
 
- void _loadImages() async {
+  void _loadImages() async {
     wallImage = await loadImage('wall_dark.png');
     blockImage = await loadImage('block.png');
-    bombImage = await loadImage('bomb_blue.png');
-    explosionImage = await loadImage('explosion_blue.png');
-    itemImage = await loadImage('speed_powerup.png');
-    playerImage = await loadImage('nerd_blue.png');
+    bombImages = [
+      await loadImage('bomb_blue.png'),
+      await loadImage('bomb_magenta.png'),
+      await loadImage('bomb_green.png'),
+      await loadImage('bomb_yellow.png')
+    ];
+    explosionImages = [
+      await loadImage('explosion_blue.png'),
+      await loadImage('explosion_magenta.png'),
+      await loadImage('explosion_green.png'),
+      await loadImage('explosion_yellow.png')
+    ];
+    itemImages = {
+      ItemType.SPEED_UP: await loadImage('powerup_speed.png'),
+      ItemType.BOMB_UP: await loadImage('powerup_bombs.png'),
+      ItemType.EXPLOSION_RANGE_UP: await loadImage('powerup_explosion.png'),
+      ItemType.LIFE_UP: await loadImage('powerup_life.png')
+    };
+    playerImages = [
+      await loadImage('nerd_blue.png'),
+      await loadImage('nerd_magenta.png'),
+      await loadImage('nerd_green.png'),
+      await loadImage('nerd_yellow.png')
+    ];
   }
 
   @override
@@ -108,159 +129,159 @@ class _GameScreenState extends State<GameScreen> {
   }
 
   @override
-Widget build(BuildContext context) {
-  return Scaffold(
-    floatingActionButton: FloatingActionButton(
-      focusNode: FocusNode(skipTraversal: true),
-      onPressed: () {
-        Provider.of<GameDataProvider>(context, listen: false).disconnect();
-        Navigator.of(context).popAndPushNamed('/');
-      },
-      child: const Icon(Icons.exit_to_app),
-    ),
-    body: Row(
-            children: [
-              Expanded(
-                flex: 2,
-                child: Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Consumer<GameDataProvider>(
-                            builder: (context, gameData, child) {
-                              return Text(
-                                  "${(gameData.timer! / 60).floor().toString().padLeft(2, '0')}:${(gameData.timer! % 60).toString().padLeft(2, '0')}",
-                                  style: TextStyle(
-                                      color: Colors.red,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 30));
-                            },
-                          ),
+  Widget build(BuildContext context) {
+    return Scaffold(
+        floatingActionButton: FloatingActionButton(
+          focusNode: FocusNode(skipTraversal: true),
+          onPressed: () {
+            Provider.of<GameDataProvider>(context, listen: false).disconnect();
+            Navigator.of(context).popAndPushNamed('/');
+          },
+          child: const Icon(Icons.exit_to_app),
+        ),
+        body: Row(
+          children: [
+            Expanded(
+              flex: 2,
+              child: Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Consumer<GameDataProvider>(
+                          builder: (context, gameData, child) {
+                            return Text(
+                                "${(gameData.timer! / 60).floor().toString().padLeft(2, '0')}:${(gameData.timer! % 60).toString().padLeft(2, '0')}",
+                                style: TextStyle(
+                                    color: Colors.red,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 30));
+                          },
                         ),
-                        Expanded(
-                          child: DefaultTextEditingShortcuts(
-                            child: KeyboardListener(
-                              autofocus: true,
-                              onKeyEvent: (event) =>
-                                  _handleKeyEvent(context, event),
-                              focusNode: _focusNode,
-                              child: Center(
-                                child: Consumer<GameDataProvider>(
-                                  builder: (context, gameData, child) {
-                                    return LayoutBuilder(
-                                      builder: (context, constraints) =>
-                                          CustomPaint(
-                                        size: Size(constraints.maxHeight,
-                                            constraints.maxHeight),
-                                        painter: GameCanvasPainter(
-                                            gameData,
-                                            constraints,
-                                            wallImage: wallImage,
-                                            blockImage: blockImage,
-                                            bombImage: bombImage,
-                                            explosionImage: explosionImage,
-                                            itemImage: itemImage,
-                                            playerImage: playerImage),
-                                      ),
-                                    );
-                                  },
-                                ),
+                      ),
+                      Expanded(
+                        child: DefaultTextEditingShortcuts(
+                          child: KeyboardListener(
+                            autofocus: true,
+                            onKeyEvent: (event) =>
+                                _handleKeyEvent(context, event),
+                            focusNode: _focusNode,
+                            child: Center(
+                              child: Consumer<GameDataProvider>(
+                                builder: (context, gameData, child) {
+                                  return LayoutBuilder(
+                                    builder: (context, constraints) =>
+                                        CustomPaint(
+                                      size: Size(constraints.maxHeight,
+                                          constraints.maxHeight),
+                                      painter: GameCanvasPainter(
+                                          gameData, constraints,
+                                          wallImage: wallImage,
+                                          blockImage: blockImage,
+                                          bombImages: bombImages,
+                                          explosionImages: explosionImages,
+                                          itemImages: itemImages,
+                                          playerImages: playerImages),
+                                    ),
+                                  );
+                                },
                               ),
                             ),
                           ),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
               ),
-              Expanded(
-                flex: 1,
-                child: Card(
-                  child: Consumer<GameDataProvider>(
-                    builder: (context, gameData, child) {
-                      return Column(
-                        children: [
-                          Padding(
+            ),
+            Expanded(
+              flex: 1,
+              child: Card(
+                child: Consumer<GameDataProvider>(
+                  builder: (context, gameData, child) {
+                    return Column(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: ListTile(
+                            title: Text("Player",
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 30)),
+                            trailing: Text("Score",
+                                style: TextStyle(
+                                    color: Colors.green,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 30)),
+                          ),
+                        ),
+                        ...gameData.players.map((player) {
+                          return Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: ListTile(
-                              title: Text("Player",
+                              title: Text(player.name,
                                   style: TextStyle(
-                                      color: Colors.white,
                                       fontWeight: FontWeight.bold,
-                                      fontSize: 30)),
-                              trailing: Text("Score",
+                                      fontSize: 16)),
+                              subtitle: Row(
+                                children: [
+                                  for (var i = 0; i < (player.lives ?? 0); i++)
+                                    Icon(
+                                      Icons.favorite,
+                                      color: Colors.red,
+                                      size: 16,
+                                    ),
+                                ],
+                              ),
+                              trailing: Text(player.score.toString(),
                                   style: TextStyle(
                                       color: Colors.green,
                                       fontWeight: FontWeight.bold,
                                       fontSize: 30)),
                             ),
-                          ),
-                          ...gameData.players.map((player) {
-                            return Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: ListTile(
-                                title: Text(player.name,
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 16)),
-                                subtitle: Row(
-                                  children: [
-                                    for (var i = 0; i < (player.lives ?? 0); i++)
-                                      Icon(
-                                        Icons.favorite,
-                                        color: Colors.red,
-                                        size: 16,
-                                      ),
-                                  ],
-                                ),
-                                trailing: Text(player.score.toString(),
-                                    style: TextStyle(
-                                        color: Colors.green,
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 30)),
-                              ),
-                            );
-                          })
-                        ],
-                      );
-                    },
-                  ),
+                          );
+                        })
+                      ],
+                    );
+                  },
                 ),
               ),
-            ],
-          )
-        );
+            ),
+          ],
+        ));
+  }
 }
-}
+
 Future<UI.Image> loadImage(String imageName) async {
   final data = await rootBundle.load('assets/pngs/$imageName');
   return decodeImageFromList(data.buffer.asUint8List());
 }
+
 class GameCanvasPainter extends CustomPainter {
-  late GameDataProvider gameData;
-  late BoxConstraints constraints;
+  final GameDataProvider gameData;
+  final BoxConstraints constraints;
 
   late double tileWidth;
 
   late UI.Image wallImage;
   late UI.Image blockImage;
-  late UI.Image bombImage;
-  late UI.Image explosionImage;
-  late UI.Image itemImage;
-  late UI.Image playerImage;
+  late List<UI.Image> bombImages;
+  late List<UI.Image> explosionImages;
+  late Map<String,UI.Image> itemImages;
+  late List<UI.Image> playerImages;
 
-  GameCanvasPainter(this.gameData, constraints,
+  GameCanvasPainter(this.gameData, this.constraints,
       {required this.wallImage,
       required this.blockImage,
-      required this.bombImage,
-      required this.explosionImage,
-      required this.itemImage,
-      required this.playerImage}) {
+      required this.bombImages,
+      required this.explosionImages,
+      required this.itemImages,
+      required this.playerImages}) {
     tileWidth = math.min(constraints.maxWidth / gameData.mapWidth,
         constraints.maxHeight / gameData.mapHeight);
   }
@@ -269,10 +290,13 @@ class GameCanvasPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final Rect tileRect = Rect.fromLTWH(0, 0, tileWidth, tileWidth);
 
+
+
     for (var wall in gameData.walls) {
       canvas.drawImageRect(
           wallImage,
-          Rect.fromLTWH(0, 0, wallImage.width.toDouble(), wallImage.height.toDouble()),
+          Rect.fromLTWH(
+              0, 0, wallImage.width.toDouble(), wallImage.height.toDouble()),
           tileRect.shift(Offset(wall.x * tileWidth, wall.y * tileWidth)),
           Paint());
     }
@@ -280,42 +304,64 @@ class GameCanvasPainter extends CustomPainter {
     for (var block in gameData.blocks) {
       canvas.drawImageRect(
           blockImage,
-          Rect.fromLTWH(0, 0, blockImage.width.toDouble(), blockImage.height.toDouble()),
+          Rect.fromLTWH(
+              0, 0, blockImage.width.toDouble(), blockImage.height.toDouble()),
           tileRect.shift(Offset(block.x * tileWidth, block.y * tileWidth)),
           Paint());
     }
 
-    for (var bomb in gameData.bombs) {
-      canvas.drawImageRect(
-          bombImage,
-          Rect.fromLTWH(0, 0, bombImage.width.toDouble(), bombImage.height.toDouble()),
-          tileRect.shift(Offset(bomb.x * tileWidth, bomb.y * tileWidth)),
-          Paint());
-    }
-
-    for (var explosion in gameData.explosions) {
-      canvas.drawImageRect(
-          explosionImage,
-          Rect.fromLTWH(0, 0, explosionImage.width.toDouble(), explosionImage.height.toDouble()),
-          tileRect.shift(Offset(explosion.x * tileWidth, explosion.y * tileWidth)),
-          Paint());
-    }
 
     for (var item in gameData.items) {
       canvas.drawImageRect(
-          itemImage,
-          Rect.fromLTWH(0, 0, itemImage.width.toDouble(), itemImage.height.toDouble()),
+          itemImages[item.type]!,
+          Rect.fromLTWH(0, 0, itemImages[item.type]!.width.toDouble(),
+              itemImages[item.type]!.height.toDouble()),
           tileRect.shift(Offset(item.x * tileWidth, item.y * tileWidth)),
           Paint());
     }
 
-    for (var player in gameData.players) {
+    // Sort players by UUID
+    var sortedPlayers = gameData.players..sort((a, b) => a.id.compareTo(b.id));
+
+    for (var i = 0; i < sortedPlayers.length; i++) {
+      var player = sortedPlayers[i];
       if (player.x != null && player.y != null) {
         canvas.drawImageRect(
-            playerImage,
-            Rect.fromLTWH(0, 0, playerImage.width.toDouble(), playerImage.height.toDouble()),
-            tileRect.shift(Offset(player.x! * tileWidth, player.y! * tileWidth)),
+            playerImages[i % playerImages.length],
+            Rect.fromLTWH(
+                0,
+                0,
+                playerImages[i % playerImages.length].width.toDouble(),
+                playerImages[i % playerImages.length].height.toDouble()),
+            tileRect
+                .shift(Offset(player.x! * tileWidth, player.y! * tileWidth)),
             Paint());
+        for (var explosion in gameData.explosions.where((explosion) =>
+            explosion.playerId == player.id)) {
+          canvas.drawImageRect(
+              explosionImages[i % explosionImages.length],
+              Rect.fromLTWH(
+                  0,
+                  0,
+                  explosionImages[i % explosionImages.length].width.toDouble(),
+                  explosionImages[i % explosionImages.length].height.toDouble()),
+              tileRect
+                  .shift(Offset(explosion.x * tileWidth, explosion.y * tileWidth)),
+              Paint());
+        }
+
+        for (var bomb in gameData.bombs.where((bomb) => bomb.ownerId == player.id)) {
+          canvas.drawImageRect(
+              bombImages[i % bombImages.length],
+              Rect.fromLTWH(
+                  0,
+                  0,
+                  bombImages[i % bombImages.length].width.toDouble(),
+                  bombImages[i % bombImages.length].height.toDouble()),
+              tileRect
+                  .shift(Offset(bomb.x * tileWidth, bomb.y * tileWidth)),
+              Paint());
+        }
       }
     }
   }

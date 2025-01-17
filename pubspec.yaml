@@ -67,18 +67,19 @@ flutter:
     - assets/pngs/bomb_green.png
     - assets/pngs/bomb_magenta.png
     - assets/pngs/bomb_yellow.png
-    - assets/pngs/bombs_powerup.png
+    - assets/pngs/powerup_bombs.png
     - assets/pngs/explosion_blue.png
     - assets/pngs/explosion_green.png
     - assets/pngs/explosion_magenta.png
-    - assets/pngs/explosion_powerup.png
+    - assets/pngs/powerup_explosion.png
     - assets/pngs/explosion_yellow.png
     - assets/pngs/nerd_blue.png
     - assets/pngs/nerd_green.png
     - assets/pngs/nerd_magenta.png
     - assets/pngs/nerd_yellow.png
-    - assets/pngs/speed_powerup.png
+    - assets/pngs/powerup_speed.png
     - assets/pngs/wall_dark.png
+    - assets/pngs/powerup_life.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

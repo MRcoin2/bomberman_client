@@ -16,6 +16,7 @@ class SettingsPanel extends StatefulWidget {
 class _SettingsPanelState extends State<SettingsPanel> {
   GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   bool _onMessageCalled = false;
+  bool _didChange = false;
   TextEditingController _widthController = TextEditingController();
   TextEditingController _heightController = TextEditingController();
   TextEditingController _blockDensityController = TextEditingController();
@@ -43,6 +44,7 @@ class _SettingsPanelState extends State<SettingsPanel> {
   }
 
   void _updateSettings(Map<String, dynamic> settings) {
+    _didChange = true;
     void updateController(TextEditingController controller, dynamic value) {
       final cursorPos = controller.selection;
       controller.text = (value ?? 0).toString();
@@ -71,9 +73,13 @@ class _SettingsPanelState extends State<SettingsPanel> {
         var data = jsonDecode(message);
         //print(data);
         if (data['Type'] == 'SERVER_LOBBY_UPDATE_SETTINGS') {
+          print("recieved settings");
           _updateSettings(data['Payload']);
         }
       });
+      //send empty message to get the current settings
+      Provider.of<GameDataProvider>(context).sendMessage(
+          '{"Type":"CLIENT_LOBBY_GET_SETTINGS","Payload":{"_":"_"}}');
     }
   }
 
