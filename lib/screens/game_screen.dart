@@ -24,12 +24,12 @@ class _GameScreenState extends State<GameScreen> {
   bool _onMessageCalled = false;
   final FocusNode _focusNode = FocusNode();
 
-  late UI.Image wallImage;
-  late UI.Image blockImage;
-  late List<UI.Image> bombImages;
-  late List<UI.Image> explosionImages;
-  late Map<String, UI.Image> itemImages;
-  late List<UI.Image> playerImages;
+  UI.Image? wallImage = null;
+  UI.Image? blockImage = null;
+  List<UI.Image>? bombImages;
+  List<UI.Image>? explosionImages;
+  Map<String, UI.Image>? itemImages;
+  List<UI.Image>? playerImages;
 
   void _handleKeyEvent(BuildContext context, KeyEvent event) {
     final gameData = Provider.of<GameDataProvider>(context, listen: false);
@@ -173,19 +173,29 @@ class _GameScreenState extends State<GameScreen> {
                               child: Consumer<GameDataProvider>(
                                 builder: (context, gameData, child) {
                                   return LayoutBuilder(
-                                    builder: (context, constraints) =>
-                                        CustomPaint(
-                                      size: Size(constraints.maxHeight,
-                                          constraints.maxHeight),
-                                      painter: GameCanvasPainter(
-                                          gameData, constraints,
-                                          wallImage: wallImage,
-                                          blockImage: blockImage,
-                                          bombImages: bombImages,
-                                          explosionImages: explosionImages,
-                                          itemImages: itemImages,
-                                          playerImages: playerImages),
-                                    ),
+                                    builder: (context, constraints){
+                                      if (wallImage == null ||
+                                          blockImage == null ||
+                                          bombImages == null ||
+                                          explosionImages == null ||
+                                          itemImages == null ||
+                                          playerImages == null) {
+                                        return CircularProgressIndicator();
+                                      }else{
+                                      return CustomPaint(
+                                        size: Size(constraints.maxHeight,
+                                            constraints.maxHeight),
+                                        painter: GameCanvasPainter(
+                                            gameData, constraints,
+                                            wallImage: wallImage,
+                                            blockImage: blockImage,
+                                            bombImages: bombImages,
+                                            explosionImages: explosionImages,
+                                            itemImages: itemImages,
+                                            playerImages: playerImages),
+                                      );
+                                    }},
+
                                   );
                                 },
                               ),
@@ -268,12 +278,12 @@ class GameCanvasPainter extends CustomPainter {
 
   late double tileWidth;
 
-  late UI.Image wallImage;
-  late UI.Image blockImage;
-  late List<UI.Image> bombImages;
-  late List<UI.Image> explosionImages;
-  late Map<String,UI.Image> itemImages;
-  late List<UI.Image> playerImages;
+   UI.Image? wallImage;
+   UI.Image? blockImage;
+   List<UI.Image>? bombImages;
+   List<UI.Image>? explosionImages;
+   Map<String,UI.Image>? itemImages;
+   List<UI.Image>? playerImages;
 
   GameCanvasPainter(this.gameData, this.constraints,
       {required this.wallImage,
@@ -294,18 +304,18 @@ class GameCanvasPainter extends CustomPainter {
 
     for (var wall in gameData.walls) {
       canvas.drawImageRect(
-          wallImage,
+          wallImage!,
           Rect.fromLTWH(
-              0, 0, wallImage.width.toDouble(), wallImage.height.toDouble()),
+              0, 0, wallImage!.width.toDouble(), wallImage!.height.toDouble()),
           tileRect.shift(Offset(wall.x * tileWidth, wall.y * tileWidth)),
           Paint());
     }
 
     for (var block in gameData.blocks) {
       canvas.drawImageRect(
-          blockImage,
+          blockImage!,
           Rect.fromLTWH(
-              0, 0, blockImage.width.toDouble(), blockImage.height.toDouble()),
+              0, 0, blockImage!.width.toDouble(), blockImage!.height.toDouble()),
           tileRect.shift(Offset(block.x * tileWidth, block.y * tileWidth)),
           Paint());
     }
@@ -313,9 +323,9 @@ class GameCanvasPainter extends CustomPainter {
 
     for (var item in gameData.items) {
       canvas.drawImageRect(
-          itemImages[item.type]!,
-          Rect.fromLTWH(0, 0, itemImages[item.type]!.width.toDouble(),
-              itemImages[item.type]!.height.toDouble()),
+          itemImages![item.type]!,
+          Rect.fromLTWH(0, 0, itemImages![item.type]!.width.toDouble(),
+              itemImages![item.type]!.height.toDouble()),
           tileRect.shift(Offset(item.x * tileWidth, item.y * tileWidth)),
           Paint());
     }
@@ -327,24 +337,24 @@ class GameCanvasPainter extends CustomPainter {
       var player = sortedPlayers[i];
       if (player.x != null && player.y != null) {
         canvas.drawImageRect(
-            playerImages[i % playerImages.length],
+            playerImages![i % playerImages!.length],
             Rect.fromLTWH(
                 0,
                 0,
-                playerImages[i % playerImages.length].width.toDouble(),
-                playerImages[i % playerImages.length].height.toDouble()),
+                playerImages![i % playerImages!.length].width.toDouble(),
+                playerImages![i % playerImages!.length].height.toDouble()),
             tileRect
                 .shift(Offset(player.x! * tileWidth, player.y! * tileWidth)),
             Paint());
         for (var explosion in gameData.explosions.where((explosion) =>
             explosion.playerId == player.id)) {
           canvas.drawImageRect(
-              explosionImages[i % explosionImages.length],
+              explosionImages![i % explosionImages!.length],
               Rect.fromLTWH(
                   0,
                   0,
-                  explosionImages[i % explosionImages.length].width.toDouble(),
-                  explosionImages[i % explosionImages.length].height.toDouble()),
+                  explosionImages![i % explosionImages!.length].width.toDouble(),
+                  explosionImages![i % explosionImages!.length].height.toDouble()),
               tileRect
                   .shift(Offset(explosion.x * tileWidth, explosion.y * tileWidth)),
               Paint());
@@ -352,12 +362,12 @@ class GameCanvasPainter extends CustomPainter {
 
         for (var bomb in gameData.bombs.where((bomb) => bomb.ownerId == player.id)) {
           canvas.drawImageRect(
-              bombImages[i % bombImages.length],
+              bombImages![i % bombImages!.length],
               Rect.fromLTWH(
                   0,
                   0,
-                  bombImages[i % bombImages.length].width.toDouble(),
-                  bombImages[i % bombImages.length].height.toDouble()),
+                  bombImages![i % bombImages!.length].width.toDouble(),
+                  bombImages![i % bombImages!.length].height.toDouble()),
               tileRect
                   .shift(Offset(bomb.x * tileWidth, bomb.y * tileWidth)),
               Paint());
