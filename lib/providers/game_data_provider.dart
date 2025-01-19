@@ -117,6 +117,7 @@ class GameDataProvider with ChangeNotifier {
         id: player["Id"],
       );
     }).toList();
+    _players.sort((a, b) => a.id.compareTo(b.id));
   }
 
   bool isConnected() {
@@ -167,9 +168,11 @@ class GameDataProvider with ChangeNotifier {
       score: player["Score"],
       bombLimit: player["BombLimit"],
       bombPower: player["BombPower"],
-      speed: player["Speed"]
+      speed: player["Speed"],
+      invincibilityTicks: player["InvincibilityTicks"],
     );
     _players.add(p);
+    _players.sort((a, b) => a.id.compareTo(b.id));
   }
 
   // Update bombs

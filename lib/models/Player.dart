@@ -9,6 +9,7 @@ class Player {
   double? x;
   double? y;
   bool isReady;
+  int invincibilityTicks;
   bool get isAlive => lives! > 0;
 
 
@@ -24,6 +25,7 @@ class Player {
     this.x,
     this.y,
     this.isReady = false,
+    this.invincibilityTicks = 0,
   });
 
 }

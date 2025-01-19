@@ -5,13 +5,12 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../models/ItemType.dart';
 import '../providers/game_data_provider.dart';
-import '../models/Player.dart';
 import 'dart:math' as math;
 import 'dart:async';
-import 'dart:typed_data';
 import 'dart:ui' as UI;
 
-import 'package:flutter/services.dart';
+
+import '../widgets/game_player_list.dart';
 
 class GameScreen extends StatefulWidget {
   const GameScreen({super.key});
@@ -122,7 +121,10 @@ class _GameScreenState extends State<GameScreen> {
                 ),
               ],
             ),
-          );
+          ).then((_) {
+            Provider.of<GameDataProvider>(context, listen: false).disconnect();
+            Navigator.of(context).popAndPushNamed("/");
+          });
         }
       });
     }
@@ -213,51 +215,7 @@ class _GameScreenState extends State<GameScreen> {
               child: Card(
                 child: Consumer<GameDataProvider>(
                   builder: (context, gameData, child) {
-                    return Column(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: ListTile(
-                            title: Text("Player",
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 30)),
-                            trailing: Text("Score",
-                                style: TextStyle(
-                                    color: Colors.green,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 30)),
-                          ),
-                        ),
-                        ...gameData.players.map((player) {
-                          return Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: ListTile(
-                              title: Text(player.name,
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 16)),
-                              subtitle: Row(
-                                children: [
-                                  for (var i = 0; i < (player.lives ?? 0); i++)
-                                    Icon(
-                                      Icons.favorite,
-                                      color: Colors.red,
-                                      size: 16,
-                                    ),
-                                ],
-                              ),
-                              trailing: Text(player.score.toString(),
-                                  style: TextStyle(
-                                      color: Colors.green,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 30)),
-                            ),
-                          );
-                        })
-                      ],
-                    );
+                    return GamePlayerList(gameData: gameData);
                   },
                 ),
               ),
@@ -302,6 +260,15 @@ class GameCanvasPainter extends CustomPainter {
 
 
 
+
+    for (var item in gameData.items) {
+      canvas.drawImageRect(
+          itemImages![item.type]!,
+          Rect.fromLTWH(0, 0, itemImages![item.type]!.width.toDouble(),
+              itemImages![item.type]!.height.toDouble()),
+          tileRect.shift(Offset(item.x * tileWidth, item.y * tileWidth)),
+          Paint());
+    }
     for (var wall in gameData.walls) {
       canvas.drawImageRect(
           wallImage!,
@@ -321,31 +288,25 @@ class GameCanvasPainter extends CustomPainter {
     }
 
 
-    for (var item in gameData.items) {
-      canvas.drawImageRect(
-          itemImages![item.type]!,
-          Rect.fromLTWH(0, 0, itemImages![item.type]!.width.toDouble(),
-              itemImages![item.type]!.height.toDouble()),
-          tileRect.shift(Offset(item.x * tileWidth, item.y * tileWidth)),
-          Paint());
-    }
-
     // Sort players by UUID
     var sortedPlayers = gameData.players..sort((a, b) => a.id.compareTo(b.id));
 
     for (var i = 0; i < sortedPlayers.length; i++) {
       var player = sortedPlayers[i];
       if (player.x != null && player.y != null) {
-        canvas.drawImageRect(
-            playerImages![i % playerImages!.length],
-            Rect.fromLTWH(
-                0,
-                0,
-                playerImages![i % playerImages!.length].width.toDouble(),
-                playerImages![i % playerImages!.length].height.toDouble()),
-            tileRect
-                .shift(Offset(player.x! * tileWidth, player.y! * tileWidth)),
-            Paint());
+        if (player.lives != 0) {
+          if (player.invincibilityTicks % 3 != 1) {
+            canvas.drawImageRect(
+                playerImages![i % playerImages!.length],
+                Rect.fromLTWH(
+                    0,
+                    0,
+                    playerImages![i % playerImages!.length].width.toDouble(),
+                    playerImages![i % playerImages!.length].height.toDouble()),
+                tileRect
+                    .shift(Offset(player.x! * tileWidth, player.y! * tileWidth)),
+                Paint());
+          }}
         for (var explosion in gameData.explosions.where((explosion) =>
             explosion.playerId == player.id)) {
           canvas.drawImageRect(
