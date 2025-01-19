@@ -4,7 +4,7 @@ class Player {
   final String name;
   final String id;
   int? lives;
-  int? score;
+  int score;
   int? bombPower;
   int? bombLimit;
   int? speed;
@@ -21,7 +21,7 @@ class Player {
     required this.name,
     required this.id,
     this.lives,
-    this.score,
+    this.score = 0,
     this.bombLimit,
     this.bombPower,
     this.speed,

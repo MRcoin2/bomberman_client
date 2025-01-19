@@ -35,7 +35,11 @@ class GameDataProvider with ChangeNotifier {
     _streamController = StreamController.broadcast();
   }
 
-  List<Player> get players => _players;
+List<Player> get players {
+  List<Player> sortedPlayers = List.from(_players);
+  sortedPlayers.sort((a, b) => b.score.compareTo(a.score));
+  return sortedPlayers;
+}
   List<Block> get blocks => _blocks;
   List<Bomb> get bombs => _bombs;
   List<Explosion> get explosions => _explosions;

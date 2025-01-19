@@ -232,12 +232,14 @@ class _GameScreenState extends State<GameScreen> {
                                 children: [
                                   Text(_outcome,
                                       style: TextStyle(
-                                          fontWeight: FontWeight.bold)),
-                                  Text("Winner (highest score): $_winner")
+                                          fontWeight: FontWeight.bold)),SizedBox(height: 10),
+                                  Text(_isDraw?"Draw":"$_winner WINS!",
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold, fontSize: 24)),
                                 ],
                               ),
                               actions: [
-                                TextButton(
+                                OutlinedButton(
                                   onPressed: () {
                                     Provider.of<GameDataProvider>(context,
                                             listen: false)
