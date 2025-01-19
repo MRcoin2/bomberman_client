@@ -30,6 +30,11 @@ class _GameScreenState extends State<GameScreen> {
   Map<String, UI.Image>? itemImages;
   List<UI.Image>? playerImages;
 
+  bool _isGameOver = false;
+  bool _isDraw = false;
+  String _outcome = '';
+  String? _winner = '';
+
   void _handleKeyEvent(BuildContext context, KeyEvent event) {
     final gameData = Provider.of<GameDataProvider>(context, listen: false);
     print(event.logicalKey.keyLabel);
@@ -106,25 +111,22 @@ class _GameScreenState extends State<GameScreen> {
         //decode the json message
         var data = jsonDecode(message);
         if (data['Type'] == 'SERVER_GAME_OVER') {
-          showDialog(
-            context: context,
-            builder: (context) => AlertDialog(
-              title: const Text('Game Over'),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    Provider.of<GameDataProvider>(context, listen: false)
-                        .disconnect();
-                    Navigator.of(context).popAndPushNamed("/");
-                  },
-                  child: const Text('Return to main menu'),
-                ),
-              ],
-            ),
-          ).then((_) {
-            Provider.of<GameDataProvider>(context, listen: false).disconnect();
-            Navigator.of(context).popAndPushNamed("/");
+          setState(() {
+            _isGameOver = true;
+            _outcome = data['Payload']['Outcome'];
+            _winner = data['Payload']['Winner'];
+            _isDraw = data['Payload']['Draw'];
           });
+
+          if (_outcome == "TIME_OUT") {
+            _outcome = "Time out!";
+          } else if (_outcome == "ALL_ELIMINATED") {
+            _outcome = "There is only one player left!";
+          }
+
+          if (_isDraw) {
+            _winner = "It's a draw!";
+          }
         }
       });
     }
@@ -133,95 +135,135 @@ class _GameScreenState extends State<GameScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        floatingActionButton: FloatingActionButton(
-          focusNode: FocusNode(skipTraversal: true),
-          onPressed: () {
-            Provider.of<GameDataProvider>(context, listen: false).disconnect();
-            Navigator.of(context).popAndPushNamed('/');
-          },
-          child: const Icon(Icons.exit_to_app),
-        ),
-        body: Row(
-          children: [
-            Expanded(
-              flex: 2,
-              child: Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Consumer<GameDataProvider>(
-                          builder: (context, gameData, child) {
-                            return Text(
-                                "${(gameData.timer! / 60).floor().toString().padLeft(2, '0')}:${(gameData.timer! % 60).toString().padLeft(2, '0')}",
+      floatingActionButton: FloatingActionButton(
+        focusNode: FocusNode(skipTraversal: true),
+        onPressed: () {
+          Provider.of<GameDataProvider>(context, listen: false).disconnect();
+          Navigator.of(context).popAndPushNamed('/');
+        },
+        child: const Icon(Icons.exit_to_app),
+      ),
+      body: Row(
+        children: [
+          Expanded(
+            flex: 2,
+            child: Card(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Stack(
+                  children: [
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Consumer<GameDataProvider>(
+                            builder: (context, gameData, child) {
+                              return Text(
+                                _isGameOver
+                                    ? "Game Over!"
+                                    : "${(gameData.timer! / 60).floor().toString().padLeft(2, '0')}:${(gameData.timer! % 60).toString().padLeft(2, '0')}",
                                 style: TextStyle(
-                                    color: Colors.red,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 30));
-                          },
+                                  color: Colors.red,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 30,
+                                ),
+                              );
+                            },
+                          ),
                         ),
-                      ),
-                      Expanded(
-                        child: DefaultTextEditingShortcuts(
-                          child: KeyboardListener(
-                            autofocus: true,
-                            onKeyEvent: (event) =>
-                                _handleKeyEvent(context, event),
-                            focusNode: _focusNode,
-                            child: Center(
-                              child: Consumer<GameDataProvider>(
-                                builder: (context, gameData, child) {
-                                  return LayoutBuilder(
-                                    builder: (context, constraints){
-                                      if (wallImage == null ||
-                                          blockImage == null ||
-                                          bombImages == null ||
-                                          explosionImages == null ||
-                                          itemImages == null ||
-                                          playerImages == null) {
-                                        return CircularProgressIndicator();
-                                      }else{
-                                      return CustomPaint(
-                                        size: Size(constraints.maxHeight,
-                                            constraints.maxHeight),
-                                        painter: GameCanvasPainter(
-                                            gameData, constraints,
-                                            wallImage: wallImage,
-                                            blockImage: blockImage,
-                                            bombImages: bombImages,
-                                            explosionImages: explosionImages,
-                                            itemImages: itemImages,
-                                            playerImages: playerImages),
-                                      );
-                                    }},
-
-                                  );
-                                },
+                        Expanded(
+                          child: DefaultTextEditingShortcuts(
+                            child: KeyboardListener(
+                              autofocus: true,
+                              onKeyEvent: (event) =>
+                                  _handleKeyEvent(context, event),
+                              focusNode: _focusNode,
+                              child: Center(
+                                child: Consumer<GameDataProvider>(
+                                  builder: (context, gameData, child) {
+                                    return LayoutBuilder(
+                                      builder: (context, constraints) {
+                                        if (wallImage == null ||
+                                            blockImage == null ||
+                                            bombImages == null ||
+                                            explosionImages == null ||
+                                            itemImages == null ||
+                                            playerImages == null) {
+                                          return CircularProgressIndicator();
+                                        } else {
+                                          return CustomPaint(
+                                            size: Size(constraints.maxHeight,
+                                                constraints.maxHeight),
+                                            painter: GameCanvasPainter(
+                                                gameData, constraints,
+                                                wallImage: wallImage,
+                                                blockImage: blockImage,
+                                                bombImages: bombImages,
+                                                explosionImages:
+                                                    explosionImages,
+                                                itemImages: itemImages,
+                                                playerImages: playerImages),
+                                          );
+                                        }
+                                      },
+                                    );
+                                  },
+                                ),
                               ),
                             ),
                           ),
                         ),
+                      ],
+                    ),
+                    if (_isGameOver)
+                      Positioned.fill(
+                        child: Container(
+                          color: Colors.black.withOpacity(0.8),
+                          child: Center(
+                            child: AlertDialog(
+                              title: const Text('Game Over!'),
+                              content: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(_outcome, style: TextStyle(fontWeight: FontWeight.bold)),
+                                  Text("Winner (highest score): $_winner")
+                                ],
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () {
+                                    Provider.of<GameDataProvider>(context,
+                                            listen: false)
+                                        .disconnect();
+                                    Navigator.of(context).popAndPushNamed("/");
+                                  },
+                                  child: const Text('Return to main menu'),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
                       ),
-                    ],
-                  ),
+                  ],
                 ),
               ),
             ),
-            Expanded(
-              flex: 1,
-              child: Card(
-                child: Consumer<GameDataProvider>(
-                  builder: (context, gameData, child) {
-                    return GamePlayerList(gameData: gameData);
-                  },
-                ),
+          ),
+          Expanded(
+            flex: 1,
+            child: Card(
+              child: Consumer<GameDataProvider>(
+                builder: (context, gameData, child) {
+                  return GamePlayerList(gameData: gameData);
+                },
               ),
             ),
-          ],
-        ));
+          ),
+        ],
+      ),
+    );
   }
 }
 
