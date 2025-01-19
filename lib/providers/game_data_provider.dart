@@ -29,6 +29,8 @@ class GameDataProvider with ChangeNotifier {
   int mapWidth=1;
   int mapHeight=1;
 
+  bool _isGameOver = false;
+
   GameDataProvider() {
     _streamController = StreamController.broadcast();
   }
@@ -41,6 +43,13 @@ class GameDataProvider with ChangeNotifier {
   int? get timer => _timer;
 
   get walls => _walls;
+
+  static const Map<String, Color> colors = {
+    "blue": Colors.blue,
+    "purple": Colors.purple,
+    "green": Colors.green,
+    "yellow": Colors.yellow,
+  };
 
   /// Establish WebSocket connection
   Future<void> connect(String url) async {
@@ -60,7 +69,6 @@ class GameDataProvider with ChangeNotifier {
       if (e is WebSocketChannelException) {
         onPolicyViolation?.call("Cannot connect to server: ${e.message}");
       }
-
       print("Error connecting to WebSocket: $e");
     }
   }
@@ -115,6 +123,7 @@ class GameDataProvider with ChangeNotifier {
         name: player["Name"],
         isReady: player["IsReady"],
         id: player["Id"],
+        playerColor: colors[player["Color"]] ?? Colors.blue,
       );
     }).toList();
     _players.sort((a, b) => a.id.compareTo(b.id));
@@ -170,6 +179,7 @@ class GameDataProvider with ChangeNotifier {
       bombPower: player["BombPower"],
       speed: player["Speed"],
       invincibilityTicks: player["InvincibilityTicks"],
+      playerColor: colors[player["Color"]] ?? Colors.blue,
     );
     _players.add(p);
     _players.sort((a, b) => a.id.compareTo(b.id));

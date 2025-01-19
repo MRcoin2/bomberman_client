@@ -4,12 +4,7 @@ import 'package:flutter/material.dart';
 
 class GamePlayerList extends StatelessWidget {
   final GameDataProvider gameData;
-  static const List<Color> colors = [
-    Colors.blue,
-    Colors.purple,
-    Colors.green,
-    Colors.yellow,
-  ];
+
   GamePlayerList({super.key, required this.gameData});
   @override
   Widget build(BuildContext context) {
@@ -38,7 +33,7 @@ class GamePlayerList extends StatelessWidget {
                 children: [
                   Text(player.name,
                       style: TextStyle(
-                          color: colors[gameData.players.indexOf(player)],
+                          color: player.playerColor,
                           fontWeight: FontWeight.bold,
                           fontSize: 16)),
                   SizedBox(width: 10),

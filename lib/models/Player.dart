@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 class Player {
   final String name;
   final String id;
@@ -11,6 +13,7 @@ class Player {
   bool isReady;
   int invincibilityTicks;
   bool get isAlive => lives! > 0;
+  Color playerColor;
 
 
 
@@ -26,6 +29,7 @@ class Player {
     this.y,
     this.isReady = false,
     this.invincibilityTicks = 0,
+    required this.playerColor,
   });
 
 }

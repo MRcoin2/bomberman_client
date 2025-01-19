@@ -9,7 +9,6 @@ import 'dart:math' as math;
 import 'dart:async';
 import 'dart:ui' as UI;
 
-
 import '../widgets/game_player_list.dart';
 
 class GameScreen extends StatefulWidget {
@@ -25,10 +24,10 @@ class _GameScreenState extends State<GameScreen> {
 
   UI.Image? wallImage = null;
   UI.Image? blockImage = null;
-  List<UI.Image>? bombImages;
-  List<UI.Image>? explosionImages;
+  Map<Color, UI.Image>? bombImages;
+  Map<Color, UI.Image>? explosionImages;
   Map<String, UI.Image>? itemImages;
-  List<UI.Image>? playerImages;
+  Map<Color, UI.Image>? playerImages;
 
   bool _isGameOver = false;
   bool _isDraw = false;
@@ -70,30 +69,34 @@ class _GameScreenState extends State<GameScreen> {
   void _loadImages() async {
     wallImage = await loadImage('wall_dark.png');
     blockImage = await loadImage('block.png');
-    bombImages = [
-      await loadImage('bomb_blue.png'),
-      await loadImage('bomb_magenta.png'),
-      await loadImage('bomb_green.png'),
-      await loadImage('bomb_yellow.png')
-    ];
-    explosionImages = [
-      await loadImage('explosion_blue.png'),
-      await loadImage('explosion_magenta.png'),
-      await loadImage('explosion_green.png'),
-      await loadImage('explosion_yellow.png')
-    ];
+
+    bombImages = {
+      Colors.blue: await loadImage('bomb_blue.png'),
+      Colors.purple: await loadImage('bomb_magenta.png'),
+      Colors.green: await loadImage('bomb_green.png'),
+      Colors.yellow: await loadImage('bomb_yellow.png')
+    };
+
+    explosionImages = {
+      Colors.blue: await loadImage('explosion_blue.png'),
+      Colors.purple: await loadImage('explosion_magenta.png'),
+      Colors.green: await loadImage('explosion_green.png'),
+      Colors.yellow: await loadImage('explosion_yellow.png')
+    };
+
     itemImages = {
       ItemType.SPEED_UP: await loadImage('powerup_speed.png'),
       ItemType.BOMB_UP: await loadImage('powerup_bombs.png'),
       ItemType.EXPLOSION_RANGE_UP: await loadImage('powerup_explosion.png'),
       ItemType.LIFE_UP: await loadImage('powerup_life.png')
     };
-    playerImages = [
-      await loadImage('nerd_blue.png'),
-      await loadImage('nerd_magenta.png'),
-      await loadImage('nerd_green.png'),
-      await loadImage('nerd_yellow.png')
-    ];
+
+    playerImages = {
+      Colors.blue: await loadImage('nerd_blue.png'),
+      Colors.purple: await loadImage('nerd_magenta.png'),
+      Colors.green: await loadImage('nerd_green.png'),
+      Colors.yellow: await loadImage('nerd_yellow.png')
+    };
   }
 
   @override
@@ -121,7 +124,7 @@ class _GameScreenState extends State<GameScreen> {
           if (_outcome == "TIME_OUT") {
             _outcome = "Time out!";
           } else if (_outcome == "ALL_ELIMINATED") {
-            _outcome = "There is only one player left!";
+            _outcome = "There is only one player alive!";
           }
 
           if (_isDraw) {
@@ -227,7 +230,9 @@ class _GameScreenState extends State<GameScreen> {
                                 mainAxisSize: MainAxisSize.min,
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(_outcome, style: TextStyle(fontWeight: FontWeight.bold)),
+                                  Text(_outcome,
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold)),
                                   Text("Winner (highest score): $_winner")
                                 ],
                               ),
@@ -278,12 +283,12 @@ class GameCanvasPainter extends CustomPainter {
 
   late double tileWidth;
 
-   UI.Image? wallImage;
-   UI.Image? blockImage;
-   List<UI.Image>? bombImages;
-   List<UI.Image>? explosionImages;
-   Map<String,UI.Image>? itemImages;
-   List<UI.Image>? playerImages;
+  UI.Image? wallImage;
+  UI.Image? blockImage;
+  Map<Color, UI.Image>? bombImages;
+  Map<Color, UI.Image>? explosionImages;
+  Map<String, UI.Image>? itemImages;
+  Map<Color, UI.Image>? playerImages;
 
   GameCanvasPainter(this.gameData, this.constraints,
       {required this.wallImage,
@@ -299,9 +304,6 @@ class GameCanvasPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final Rect tileRect = Rect.fromLTWH(0, 0, tileWidth, tileWidth);
-
-
-
 
     for (var item in gameData.items) {
       canvas.drawImageRect(
@@ -323,56 +325,52 @@ class GameCanvasPainter extends CustomPainter {
     for (var block in gameData.blocks) {
       canvas.drawImageRect(
           blockImage!,
-          Rect.fromLTWH(
-              0, 0, blockImage!.width.toDouble(), blockImage!.height.toDouble()),
+          Rect.fromLTWH(0, 0, blockImage!.width.toDouble(),
+              blockImage!.height.toDouble()),
           tileRect.shift(Offset(block.x * tileWidth, block.y * tileWidth)),
           Paint());
     }
 
-
-    // Sort players by UUID
-    var sortedPlayers = gameData.players..sort((a, b) => a.id.compareTo(b.id));
-
-    for (var i = 0; i < sortedPlayers.length; i++) {
-      var player = sortedPlayers[i];
+    for (var player in gameData.players) {
       if (player.x != null && player.y != null) {
         if (player.lives != 0) {
           if (player.invincibilityTicks % 3 != 1) {
             canvas.drawImageRect(
-                playerImages![i % playerImages!.length],
+                playerImages![player.playerColor]!,
                 Rect.fromLTWH(
                     0,
                     0,
-                    playerImages![i % playerImages!.length].width.toDouble(),
-                    playerImages![i % playerImages!.length].height.toDouble()),
-                tileRect
-                    .shift(Offset(player.x! * tileWidth, player.y! * tileWidth)),
+                    playerImages![player.playerColor]!.width.toDouble(),
+                    playerImages![player.playerColor]!.height.toDouble()),
+                tileRect.shift(
+                    Offset(player.x! * tileWidth, player.y! * tileWidth)),
                 Paint());
-          }}
-        for (var explosion in gameData.explosions.where((explosion) =>
-            explosion.playerId == player.id)) {
+          }
+        }
+        for (var explosion in gameData.explosions
+            .where((explosion) => explosion.playerId == player.id)) {
           canvas.drawImageRect(
-              explosionImages![i % explosionImages!.length],
+              explosionImages![player.playerColor]!,
               Rect.fromLTWH(
                   0,
                   0,
-                  explosionImages![i % explosionImages!.length].width.toDouble(),
-                  explosionImages![i % explosionImages!.length].height.toDouble()),
-              tileRect
-                  .shift(Offset(explosion.x * tileWidth, explosion.y * tileWidth)),
+                  explosionImages![player.playerColor]!.width.toDouble(),
+                  explosionImages![player.playerColor]!.height.toDouble()),
+              tileRect.shift(
+                  Offset(explosion.x * tileWidth, explosion.y * tileWidth)),
               Paint());
         }
 
-        for (var bomb in gameData.bombs.where((bomb) => bomb.ownerId == player.id)) {
+        for (var bomb
+            in gameData.bombs.where((bomb) => bomb.ownerId == player.id)) {
           canvas.drawImageRect(
-              bombImages![i % bombImages!.length],
+              bombImages![player.playerColor]!,
               Rect.fromLTWH(
                   0,
                   0,
-                  bombImages![i % bombImages!.length].width.toDouble(),
-                  bombImages![i % bombImages!.length].height.toDouble()),
-              tileRect
-                  .shift(Offset(bomb.x * tileWidth, bomb.y * tileWidth)),
+                  bombImages![player.playerColor]!.width.toDouble(),
+                  bombImages![player.playerColor]!.height.toDouble()),
+              tileRect.shift(Offset(bomb.x * tileWidth, bomb.y * tileWidth)),
               Paint());
         }
       }
