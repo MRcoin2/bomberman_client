@@ -68,6 +68,11 @@ class _MainScreenState extends State<MainScreen> {
                     const SizedBox(height: 16),
                     TextField(
                       controller: _ipController,
+                      onChanged: (text) {
+                        setState(() {
+
+                        });
+                      },
                       decoration: const InputDecoration(
                         border: OutlineInputBorder(),
                         labelText: 'IP Address',

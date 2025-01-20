@@ -47,15 +47,17 @@ class _ScoreboardState extends State<Scoreboard> {
         } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
           return Center(child: Text('No data available'));
         } else {
-          return ListView.builder(
-            itemCount: snapshot.data!.length,
-            itemBuilder: (context, index) {
-              final player = snapshot.data![index];
-              return ListTile(
-                title: Text(player['name']),
-                trailing: Text(player['score'].toString()),
-              );
-            },
+          return SizedBox.expand(
+            child: ListView.builder(
+              itemCount: snapshot.data!.length,
+              itemBuilder: (context, index) {
+                final player = snapshot.data![index];
+                return ListTile(
+                  title: Text(player['name']),
+                  trailing: Text(player['score'].toString()),
+                );
+              },
+            ),
           );
         }
       },
