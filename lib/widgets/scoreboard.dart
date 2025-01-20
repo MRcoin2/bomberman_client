@@ -199,7 +199,7 @@ class _ScoreboardState extends State<Scoreboard> {
                               ),
                               Padding(
                                 padding: const EdgeInsets.all(8.0),
-                                child: Text(player['storedKDRatio'].toString(),
+                                child: Text(double.parse(player['storedKDRatio'].toString()).toStringAsFixed(2),
                                     style: TextStyle(
                                         color: Colors.green,
                                         fontSize: 16)),
