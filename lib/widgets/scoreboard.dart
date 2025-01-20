@@ -21,7 +21,7 @@ class _ScoreboardState extends State<Scoreboard> {
   }
 
   Future<List<dynamic>> _fetchScoreboardData() async {
-    final url = 'http://${widget.ip}/scoreboard';
+    final url = 'HTTP://localhost:5038/scoreboard/scoreboard/top20';
     try {
       final response = await http.get(Uri.parse(url));
       if (response.statusCode == 200) {

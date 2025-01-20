@@ -164,7 +164,7 @@ class _SettingsPanelState extends State<SettingsPanel> {
                                     return 'Please enter a value';
                                   }
                                   try{
-                                    double.parse(value!);
+                                    double.parse(value);
                                   }catch(e){
                                     return 'Please enter a valid number e.g. 0.5';
                                   }
