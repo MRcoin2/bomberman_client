@@ -16,10 +16,10 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   final TextEditingController _nameController = TextEditingController();
-
   final TextEditingController _ipController = TextEditingController();
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final ValueNotifier<String> _ipNotifier = ValueNotifier<String>('localhost:5038');
 
   @override
   void initState() {
@@ -27,6 +27,12 @@ class _MainScreenState extends State<MainScreen> {
     _ipController.text = 'localhost:5038';
 
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _ipNotifier.dispose();
+    super.dispose();
   }
 
   void _handlePolicyViolation(String message) {
@@ -69,9 +75,7 @@ class _MainScreenState extends State<MainScreen> {
                     TextField(
                       controller: _ipController,
                       onChanged: (text) {
-                        setState(() {
-
-                        });
+                        _ipNotifier.value = text;
                       },
                       decoration: const InputDecoration(
                         border: OutlineInputBorder(),
@@ -149,9 +153,10 @@ class _MainScreenState extends State<MainScreen> {
               ),
             ),
           ),
-          Expanded(flex: 3, child: Card(child: SingleChildScrollView(
-            child: 
-              Scoreboard(_ipController.text),
+          Expanded(flex: 3, child: Card(child: Column(
+            children: [
+              Scoreboard(_ipNotifier),
+            ],
           ))),
         ],
       ),
