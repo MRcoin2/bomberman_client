@@ -149,11 +149,9 @@ class _MainScreenState extends State<MainScreen> {
               ),
             ),
           ),
-          Expanded(flex: 3, child: Card(child: Column(
-            children: [
-              Text('Scoreboard', style: TextStyle(fontSize: 24)),
+          Expanded(flex: 3, child: Card(child: SingleChildScrollView(
+            child: 
               Scoreboard(_ipController.text),
-            ],
           ))),
         ],
       ),

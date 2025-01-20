@@ -47,17 +47,46 @@ class _ScoreboardState extends State<Scoreboard> {
         } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
           return Center(child: Text('No data available'));
         } else {
-          return SizedBox.expand(
-            child: ListView.builder(
-              itemCount: snapshot.data!.length,
-              itemBuilder: (context, index) {
-                final player = snapshot.data![index];
-                return ListTile(
-                  title: Text(player['name']),
-                  trailing: Text(player['score'].toString()),
+          return Column(
+            children: [
+              const Padding(
+                padding: EdgeInsets.all(8.0),
+                child: ListTile(
+                  title: Text("Player",
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 30)),
+                  trailing: Text("Score",
+                      style: TextStyle(
+                          color: Colors.green,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 30)),
+                ),
+              ),
+              ...snapshot.data!.map((player) {
+                return Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: ListTile(
+                    title: Row(
+                      children: [
+                        Text(player['username'],
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16)),
+                        SizedBox(width: 10),
+                        Text(player['topScore'].toString(),
+                            style: TextStyle(
+                                color: Colors.green,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16)),
+                      ],
+                    ),
+                  ),
                 );
-              },
-            ),
+              }),
+            ],
           );
         }
       },
