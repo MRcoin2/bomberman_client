@@ -21,18 +21,19 @@ class _ScoreboardState extends State<Scoreboard> {
   }
 
   Future<List<dynamic>> _fetchScoreboardData() async {
-    final url = 'HTTP://localhost:5038/scoreboard/scoreboard/top20';
-    try {
-      final response = await http.get(Uri.parse(url));
+      var uri = Uri.http(widget.ip, '/scoreboard/scoreboard/top20');
+      final response = await http.get(uri, headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      });
+      print(response.body);
       if (response.statusCode == 200) {
         return jsonDecode(response.body);
       } else {
         throw Exception('Failed to load scoreboard');
       }
-    } catch (e) {
-      throw Exception('Invalid IP address or server error');
     }
-  }
+  
 
   @override
   Widget build(BuildContext context) {
