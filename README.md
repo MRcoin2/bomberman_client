@@ -1,16 +1,13 @@
 # bomberman_client
 
-Bomberman frontend
+Frontend for a small game written in the .NET framework
 
-## Getting Started
+# UI
+## main page
+![image](https://github.com/user-attachments/assets/e392a1ab-34eb-4cf5-a61e-ad9f455e7f11)
 
-This project is a starting point for a Flutter application.
+## lobby
+![image](https://github.com/user-attachments/assets/56fac716-e547-4dcd-a2c1-9beca063cf69)
 
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## game
+![image](https://github.com/user-attachments/assets/b0b5a387-58e9-496b-8717-632b23bae195)
